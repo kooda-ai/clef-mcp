@@ -1,0 +1,35 @@
+{
+  "name": "clef-mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing Ollama's /v1/systemone decision endpoint as a single decide tool",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "clef-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/*.js",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "test:e2e": "npm run build && vitest run test/e2e.test.ts",
+    "test:integration": "vitest run test/integration.test.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.2.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.4.0",
+    "@types/node": "^24.0.0",
+    "shx": "^0.4.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
+  }
+}
