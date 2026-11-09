@@ -134,9 +134,9 @@ describe("decide", () => {
 
   it.each([
     [400, ["HTTP 400", "boom-400", "context"]],
-    [401, ["HTTP 401", "CLEF_API_KEY"]],
+    [401, ["HTTP 401", "boom-401", "CLEF_API_KEY", "ollama signin"]],
     [402, ["HTTP 402", "boom-402", "plan"]],
-    [404, ["HTTP 404", "clef", "ollama pull clef"]],
+    [404, ["HTTP 404", "boom-404", "clef", "ollama pull clef"]],
     [413, ["HTTP 413", "too large"]],
     [500, ["HTTP 500", "boom-500"]],
   ])("maps upstream error status %i to ClefApiError", async (status, parts) => {

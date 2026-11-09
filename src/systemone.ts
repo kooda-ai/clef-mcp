@@ -136,11 +136,11 @@ function apiErrorMessage(cfg: Config, status: number, body: string): string {
     case 400:
       return `Ollama rejected the request (HTTP 400): ${detail}. Check the questions and criteria, and that the state fits in the model context.`;
     case 401:
-      return "Ollama returned HTTP 401: the API key is missing or invalid. Set CLEF_API_KEY to a valid key from https://ollama.com/settings/keys.";
+      return `Ollama returned HTTP 401: ${detail}. The API key is missing or invalid: set CLEF_API_KEY to a valid key from https://ollama.com/settings/keys. For a local Ollama server, run \`ollama signin\`.`;
     case 402:
       return `Ollama returned HTTP 402: ${detail}. The account plan or payment status does not allow this request.`;
     case 404:
-      return `Ollama returned HTTP 404: model "${cfg.model}" was not found. Check CLEF_MODEL; on a local server run \`ollama pull ${cfg.model}\`.`;
+      return `Ollama returned HTTP 404: ${detail}. Model "${cfg.model}" may not exist or the path may be wrong. Check CLEF_MODEL; on a local server run \`ollama pull ${cfg.model}\`.`;
     case 413:
       return "Ollama returned HTTP 413: the request is too large. Shorten the state or send fewer or smaller images.";
     case 500:

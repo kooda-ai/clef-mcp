@@ -38,8 +38,40 @@ describe("loadConfig", () => {
   it("parses CLEF_TIMEOUT_MS and rejects non-positive or non-integer values", () => {
     const local = { CLEF_BASE_URL: "http://localhost:11434" };
     expect(loadConfig({ ...local, CLEF_TIMEOUT_MS: "2500" }).timeoutMs).toBe(2500);
-    for (const bad of ["0", "-5", "fast", "1.5"]) {
+    for (const bad of ["0", "-5", "fast", "1.5", "0x10", "1e3", "2147483648"]) {
       expect(() => loadConfig({ ...local, CLEF_TIMEOUT_MS: bad })).toThrow(ConfigError);
+    }
+    expect(loadConfig({ ...local, CLEF_TIMEOUT_MS: "2147483647" }).timeoutMs).toBe(2147483647);
+  });
+
+  it("rejects an API key with control or whitespace characters without echoing it", () => {
+    for (const bad of ["abc\ndef", "abc\rdef", "abc\0def", "abc def"]) {
+      let message = "";
+      try {
+        loadConfig({ CLEF_API_KEY: bad });
+      } catch (e) {
+        expect(e).toBeInstanceOf(ConfigError);
+        message = (e as Error).message;
+      }
+      expect(message).toContain("CLEF_API_KEY");
+      expect(message).not.toContain("abc");
+      expect(message).not.toContain("def");
+    }
+  });
+
+  it("rejects credentials, query, or fragment in CLEF_BASE_URL without echoing the URL", () => {
+    let message = "";
+    try {
+      loadConfig({ CLEF_BASE_URL: "http://user:pw@localhost:11434" });
+    } catch (e) {
+      expect(e).toBeInstanceOf(ConfigError);
+      message = (e as Error).message;
+    }
+    expect(message).toContain("CLEF_BASE_URL");
+    expect(message).not.toContain("pw");
+    expect(message).not.toContain("user");
+    for (const bad of ["http://localhost:11434/?x=1", "http://localhost:11434/#a", "http://u@localhost:11434"]) {
+      expect(() => loadConfig({ CLEF_BASE_URL: bad })).toThrow(ConfigError);
     }
   });
 

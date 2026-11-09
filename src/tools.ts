@@ -32,7 +32,7 @@ const questionSchema = z.discriminatedUnion("type", [
     type: z.literal("choice"),
     instructions: instructionsSchema,
     criteria: z
-      .record(z.string().trim().min(1), z.string().nullable())
+      .record(z.string().regex(/\S/), z.string().nullable())
       .refine((criteria) => {
         const count = Object.keys(criteria).length;
         return count >= 2 && count <= 26;

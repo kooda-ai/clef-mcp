@@ -176,6 +176,22 @@ describe("clef-mcp decide tool", () => {
     expect(forwardedBody().questions).toEqual(questions);
   });
 
+  it("forwards choice criteria keys unchanged without merging whitespace variants", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(successBody));
+    const questions = {
+      label: {
+        type: "choice",
+        instructions: "Label",
+        criteria: { " a ": "x", a: "y" },
+      },
+    };
+
+    const result = await decideCall({ state: "text", questions });
+
+    expect(result.isError).toBeUndefined();
+    expect(forwardedBody().questions).toEqual(questions);
+  });
+
   it("accepts noul without criteria and object/array instructions and state", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse(successBody));
     const args = {
@@ -278,5 +294,6 @@ describe("clef-mcp decide tool", () => {
 
     expect(result.isError).toBe(true);
     expect(resultText(result)).toContain("ollama pull clef");
+    expect(resultText(result)).toContain("model not found");
   });
 });

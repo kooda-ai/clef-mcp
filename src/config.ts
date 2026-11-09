@@ -15,6 +15,7 @@ export interface Config {
 const DEFAULT_BASE_URL = "https://ollama.com";
 const DEFAULT_MODEL = "clef";
 const DEFAULT_TIMEOUT_MS = 60000;
+const MAX_TIMEOUT_MS = 2147483647;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const rawUrl = env.CLEF_BASE_URL;
@@ -34,9 +35,24 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       `CLEF_BASE_URL must use http or https, got: ${urlText}. See README.md.`,
     );
   }
+  if (parsed.username || parsed.password) {
+    throw new ConfigError(
+      "CLEF_BASE_URL must not contain credentials. Pass the key in CLEF_API_KEY instead. See README.md.",
+    );
+  }
+  if (parsed.search || parsed.hash) {
+    throw new ConfigError(
+      "CLEF_BASE_URL must not contain a query string or fragment. See README.md.",
+    );
+  }
   const baseUrl = urlText.replace(/\/+$/, "");
 
   const apiKey = env.CLEF_API_KEY?.trim();
+  if (apiKey !== undefined && apiKey !== "" && !/^[\x21-\x7E]+$/.test(apiKey)) {
+    throw new ConfigError(
+      "CLEF_API_KEY contains whitespace, control, or non-ASCII characters. Check that the key was copied correctly. See README.md.",
+    );
+  }
   const hostname = parsed.hostname;
   const requiresKey = hostname === "ollama.com" || hostname.endsWith(".ollama.com");
   if (requiresKey && !apiKey) {
@@ -48,9 +64,9 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const model = env.CLEF_MODEL?.trim() || DEFAULT_MODEL;
 
   const timeoutMs = parseEnvInteger(env.CLEF_TIMEOUT_MS, "CLEF_TIMEOUT_MS", DEFAULT_TIMEOUT_MS);
-  if (timeoutMs < 1) {
+  if (timeoutMs < 1 || timeoutMs > MAX_TIMEOUT_MS) {
     throw new ConfigError(
-      `CLEF_TIMEOUT_MS must be a positive integer, got: ${env.CLEF_TIMEOUT_MS}`,
+      `CLEF_TIMEOUT_MS must be a positive integer of at most ${MAX_TIMEOUT_MS}, got: ${env.CLEF_TIMEOUT_MS}`,
     );
   }
 
@@ -65,9 +81,9 @@ function parseEnvInteger(value: string | undefined, name: string, fallback: numb
   if (value === undefined || value.trim() === "") {
     return fallback;
   }
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed)) {
-    throw new ConfigError(`${name} must be an integer, got: ${value}`);
+  const trimmed = value.trim();
+  if (!/^\d+$/.test(trimmed)) {
+    throw new ConfigError(`${name} must be a positive integer, got: ${value}`);
   }
-  return parsed;
+  return Number(trimmed);
 }

@@ -14,7 +14,7 @@ MCP server (stdio) that exposes Ollama's `POST /v1/systemone` decision endpoint 
 Model names:
 
 - `clef` on Ollama Cloud (`https://ollama.com`).
-- `clef:cloud` through a local Ollama server that proxies to the cloud.
+- `clef:cloud` through a local Ollama server that proxies to the cloud. This requires Ollama v0.40.5 or later and a local server signed in to ollama.com (`ollama signin`).
 - `clef` for a locally pulled model.
 
 The API key is never logged or included in error messages or tool output.
