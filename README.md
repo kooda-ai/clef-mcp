@@ -19,16 +19,10 @@ Model names:
 
 The API key is never logged or included in error messages or tool output.
 
-## Build
-
-```bash
-npm install && npm run build
-```
-
 ## Claude Code setup
 
 ```bash
-claude mcp add clef -e CLEF_API_KEY=your-key -e CLEF_MODEL=clef -- node /absolute/path/to/clef-mcp/dist/index.js
+claude mcp add clef -e CLEF_API_KEY=your-key -e CLEF_MODEL=clef -- npx -y @kooda-ai/clef-mcp
 ```
 
 Or in `.mcp.json`:
@@ -37,8 +31,8 @@ Or in `.mcp.json`:
 {
   "mcpServers": {
     "clef": {
-      "command": "node",
-      "args": ["/absolute/path/to/clef-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@kooda-ai/clef-mcp"],
       "env": {
         "CLEF_BASE_URL": "https://ollama.com",
         "CLEF_API_KEY": "your-key",
@@ -55,8 +49,8 @@ Local Ollama variant (no key):
 {
   "mcpServers": {
     "clef": {
-      "command": "node",
-      "args": ["/absolute/path/to/clef-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@kooda-ai/clef-mcp"],
       "env": {
         "CLEF_BASE_URL": "http://localhost:11434",
         "CLEF_MODEL": "clef:cloud"
@@ -108,7 +102,15 @@ Answer semantics:
 
 The result also carries `usage` with `input_tokens` and `output_tokens`.
 
-## Tests
+## Development
+
+Build from source:
+
+```bash
+npm install && npm run build
+```
+
+Run the tests:
 
 ```bash
 npm run build && npm test
