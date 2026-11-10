@@ -59,6 +59,34 @@ describe("loadConfig", () => {
     }
   });
 
+  it("does not echo an unparseable CLEF_BASE_URL in the error message", () => {
+    const raw = "http://user:s3cret@[bad";
+    let message = "";
+    try {
+      loadConfig({ CLEF_BASE_URL: raw });
+    } catch (e) {
+      expect(e).toBeInstanceOf(ConfigError);
+      message = (e as Error).message;
+    }
+    expect(message).toContain("CLEF_BASE_URL is not a valid URL");
+    expect(message).not.toContain("s3cret");
+    expect(message).not.toContain(raw);
+  });
+
+  it("echoes only the protocol for a non-http CLEF_BASE_URL, never the raw value", () => {
+    const raw = "ftp://user:s3cret@host";
+    let message = "";
+    try {
+      loadConfig({ CLEF_BASE_URL: raw });
+    } catch (e) {
+      expect(e).toBeInstanceOf(ConfigError);
+      message = (e as Error).message;
+    }
+    expect(message).toContain("ftp:");
+    expect(message).not.toContain("s3cret");
+    expect(message).not.toContain(raw);
+  });
+
   it("rejects credentials, query, or fragment in CLEF_BASE_URL without echoing the URL", () => {
     let message = "";
     try {

@@ -27,12 +27,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     parsed = new URL(urlText);
   } catch {
     throw new ConfigError(
-      `CLEF_BASE_URL is not a valid URL: ${urlText}. It must be an absolute http(s) URL, e.g. http://localhost:11434. See README.md.`,
+      "CLEF_BASE_URL is not a valid URL. It must be an absolute http(s) URL, e.g. http://localhost:11434. See README.md.",
     );
   }
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
     throw new ConfigError(
-      `CLEF_BASE_URL must use http or https, got: ${urlText}. See README.md.`,
+      `CLEF_BASE_URL must use http or https, got: ${parsed.protocol}. See README.md.`,
     );
   }
   if (parsed.username || parsed.password) {
